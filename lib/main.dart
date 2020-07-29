@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form_validation/src/blocs/provider.dart';
 import 'package:form_validation/src/pages/home_page.dart';
 import 'package:form_validation/src/pages/login_page.dart';
+import 'package:form_validation/src/pages/producto_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,10 +15,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Formularios',
         debugShowCheckedModeBanner: false,
-        initialRoute: LoginPage.route,
+        initialRoute: HomePage.route,
         routes: {
           LoginPage.route : (BuildContext context) => LoginPage(),
           HomePage.route : (BuildContext context) => HomePage(),
+          ProductPage.route : (BuildContext context) => ProductPage(),
         },
         theme: ThemeData(
           primaryColor: Colors.deepPurple,

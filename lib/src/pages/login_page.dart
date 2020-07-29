@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:form_validation/src/blocs/login_bloc.dart';
 import 'package:form_validation/src/blocs/provider.dart';
+import 'package:form_validation/src/pages/home_page.dart';
 
 class LoginPage extends StatelessWidget {
   static final route = "/login";
@@ -95,7 +96,7 @@ class LoginPage extends StatelessWidget {
                 Text("Ingreso", style: TextStyle(fontSize: 20.0),),
                 SizedBox(height: 20.0,),
                 _fields(bloc),
-                _boton(bloc),
+                _boton(context, bloc),
               ],
             ),
           ),
@@ -155,12 +156,12 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _boton(LoginBloc bloc) {
+  Widget _boton(BuildContext context, LoginBloc bloc) {
     return StreamBuilder(
       stream: bloc.formValidStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return RaisedButton(
-          onPressed: (snapshot.hasData) ? (){ _login(bloc);} : null,
+          onPressed: (snapshot.hasData) ? (){ _login(context, bloc);} : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -174,8 +175,7 @@ class LoginPage extends StatelessWidget {
       },);
   }
 
-  _login(LoginBloc bloc){
-    print("Email: ${bloc.email}");
-    print("Password: ${bloc.password}");
+  _login(BuildContext context, LoginBloc bloc){
+    Navigator.pushReplacementNamed(context, HomePage.route);
   }
 }
