@@ -4,22 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:form_validation/src/blocs/login_bloc.dart';
 import 'package:form_validation/src/blocs/provider.dart';
 import 'package:form_validation/src/pages/home_page.dart';
-import 'package:form_validation/src/pages/registro_page.dart';
 import 'package:form_validation/src/providers/usuarios_providers.dart';
 import 'package:form_validation/src/utils/utils.dart';
 
-class LoginPage extends StatelessWidget {
-  static final route = "/login";
-  final provider = UsuarioProvider();
+class RegistroPage extends StatelessWidget {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final usuarioProvider = UsuarioProvider();
+  static final route = "/registro";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          _background(context),
-          _card(context),
-        ],
-      )
+      key: scaffoldKey,
+        body: Stack(
+          children: <Widget>[
+            _background(context),
+            _card(context),
+          ],
+        )
     );
   }
 
@@ -29,12 +30,12 @@ class LoginPage extends StatelessWidget {
       height: size.height * 0.4,
       width: size.width,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: <Color>[
-            Color.fromRGBO(63, 63, 156, 1.0),
-            Color.fromRGBO(90, 70, 178, 1.0),
-          ]
-        )
+          gradient: LinearGradient(
+              colors: <Color>[
+                Color.fromRGBO(63, 63, 156, 1.0),
+                Color.fromRGBO(90, 70, 178, 1.0),
+              ]
+          )
       ),
     );
 
@@ -97,7 +98,7 @@ class LoginPage extends StatelessWidget {
             ),
             child: Column(
               children: <Widget>[
-                Text("Ingreso", style: TextStyle(fontSize: 20.0),),
+                Text("Registro", style: TextStyle(fontSize: 20.0),),
                 SizedBox(height: 20.0,),
                 _fields(bloc),
                 _boton(context, bloc),
@@ -105,8 +106,6 @@ class LoginPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 50.0,),
-          FlatButton(onPressed: ()=> Navigator.pushNamed(context, RegistroPage.route), child: Text("Crear cuenta")),
-          SizedBox(height: 100.0,)
         ],
       ),
     );
@@ -122,14 +121,14 @@ class LoginPage extends StatelessWidget {
             return Container(
               padding: EdgeInsets.symmetric(horizontal:20.0),
               child: TextField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
                     icon: Icon(Icons.alternate_email, color: Colors.deepPurple,),
                     hintText: "ejemplo@example.com",
                     labelText: "Correo Electrónico",
                     counterText: snapshot.data,
                     errorText: snapshot.error,
-                ),
+                  ),
                   onChanged: (String value) => bloc.changeEmail(value)
               ),
             );
@@ -145,10 +144,10 @@ class LoginPage extends StatelessWidget {
                 keyboardType: TextInputType.text,
                 obscureText: true,
                 decoration: InputDecoration(
-                    icon: Icon(Icons.lock_outline, color: Colors.deepPurple,),
-                    labelText: "Contraseña",
-                    counterText: snapshot.data,
-                    errorText: snapshot.error,
+                  icon: Icon(Icons.lock_outline, color: Colors.deepPurple,),
+                  labelText: "Contraseña",
+                  counterText: snapshot.data,
+                  errorText: snapshot.error,
                 ),
                 onChanged: (String value) => bloc.changePassword(value),
               ),
@@ -165,7 +164,7 @@ class LoginPage extends StatelessWidget {
       stream: bloc.formValidStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return RaisedButton(
-          onPressed: (snapshot.hasData) ? (){ _login(context, bloc);} : null,
+          onPressed: (snapshot.hasData) ? (){ _register(context, bloc);} : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -173,19 +172,18 @@ class LoginPage extends StatelessWidget {
           textColor: Colors.white,
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 15.0),
-            child: Text("Iniciar sesión"),
+            child: Text("Registrarse"),
           ),
         );
       },);
   }
 
-  _login(BuildContext context, LoginBloc bloc)async{
-    final res = await provider.loginUsuario(bloc.email, bloc.password);
-    if(res["ok"]){
+  _register(BuildContext context, LoginBloc bloc) async{
+    final resp = await usuarioProvider.nuevoUser(bloc.email, bloc.password);
+    if(resp["ok"]){
       Navigator.pushReplacementNamed(context, HomePage.route);
     }else {
-      mostrarAlerta(context, res["error"]);
+      mostrarAlerta(context, resp["error"]);
     }
-    //Navigator.pushReplacementNamed(context, HomePage.route);
   }
 }

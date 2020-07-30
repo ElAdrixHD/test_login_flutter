@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:form_validation/src/blocs/productos_bloc.dart';
+import 'package:form_validation/src/blocs/provider.dart';
 import 'package:form_validation/src/models/producto_model.dart';
-import 'package:form_validation/src/providers/productos_providers.dart';
 import 'package:form_validation/src/utils/utils.dart' as util;
 import 'package:image_picker/image_picker.dart';
 
@@ -18,11 +19,12 @@ class _ProductPageState extends State<ProductPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   ProductoModel producto = ProductoModel();
   bool _guardando = false;
-  final provider = ProductosProviders();
+  ProductosBloc bloc;
   File photo;
 
   @override
   Widget build(BuildContext context) {
+    bloc = Provider.productosBloc(context);
     final prodArg = ModalRoute.of(context).settings.arguments;
     if(prodArg != null){
       producto = prodArg;
@@ -113,18 +115,18 @@ class _ProductPageState extends State<ProductPage> {
      });
 
      if(photo != null){
-       producto.url = await provider.subirImagen(photo);
+       producto.url = await bloc.subirFoto(photo);
      }
 
      if(producto.id == null){
-       provider.crearProducto(producto);
+       bloc.agregarProducto(producto);
        setState(() {
          _guardando = false;
        });
        _snackbar("Registro Creado");
        Navigator.pop(context);
      }else{
-       provider.actualizarProducto(producto);
+       bloc.editarProducto(producto);
        setState(() {
          _guardando = false;
        });
