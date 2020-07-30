@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:form_validation/src/models/producto_model.dart';
 import 'package:form_validation/src/providers/productos_providers.dart';
 import 'package:form_validation/src/utils/utils.dart' as util;
+import 'package:image_picker/image_picker.dart';
 
 class ProductPage extends StatefulWidget {
   static final route = "/product";
@@ -16,6 +19,7 @@ class _ProductPageState extends State<ProductPage> {
   ProductoModel producto = ProductoModel();
   bool _guardando = false;
   final provider = ProductosProviders();
+  File photo;
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +34,11 @@ class _ProductPageState extends State<ProductPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.photo_size_select_actual),
-            onPressed: () {},
+            onPressed: ()=> _procesarImagen(ImageSource.gallery),
           ),
           IconButton(
             icon: Icon(Icons.camera_alt),
-            onPressed: () {},
+            onPressed: ()=>_procesarImagen(ImageSource.camera),
           ),
         ],
       ),
@@ -45,6 +49,7 @@ class _ProductPageState extends State<ProductPage> {
             key: formKey,
             child: Column(
               children: <Widget>[
+                _mostrarFoto(),
                 _crearName(),
                 _crearPrecio(),
                 _crearDisponible(),
@@ -98,7 +103,7 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _submit(){
+  void _submit() async{
      if(!formKey.currentState.validate()) return;
 
      formKey.currentState.save();
@@ -107,12 +112,17 @@ class _ProductPageState extends State<ProductPage> {
        _guardando = true;
      });
 
+     if(photo != null){
+       producto.url = await provider.subirImagen(photo);
+     }
+
      if(producto.id == null){
        provider.crearProducto(producto);
        setState(() {
          _guardando = false;
        });
        _snackbar("Registro Creado");
+       Navigator.pop(context);
      }else{
        provider.actualizarProducto(producto);
        setState(() {
@@ -121,6 +131,7 @@ class _ProductPageState extends State<ProductPage> {
        _snackbar("Registro Actualizado");
        Navigator.pop(context);
      }
+
 
   }
 
@@ -140,5 +151,35 @@ class _ProductPageState extends State<ProductPage> {
         });
       },
     );
+  }
+
+  _mostrarFoto(){
+    if(producto.url != null){
+      return FadeInImage(image: NetworkImage(producto.url),fit: BoxFit.cover, height: 300.0, placeholder: AssetImage("assets/jar-loading.gif"),);
+    }else{
+      return (photo == null) ? Image(
+        image: AssetImage('assets/no-image.png'),
+        height: 300.0,
+        fit: BoxFit.cover,
+      ) : Image.file(
+        File(photo.path),
+        height: 300,
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
+
+  _procesarImagen(ImageSource tipo)async {
+    final _picker = ImagePicker();
+    final _pickerPhoto = await _picker.getImage(source: tipo);
+
+    photo = File(_pickerPhoto.path);
+
+    if(photo != null){
+      producto.url = null;
+    }
+
+    setState(() {});
   }
 }

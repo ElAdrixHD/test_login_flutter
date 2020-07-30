@@ -41,6 +41,7 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
         if(snapshot.hasData){
           return ListView.builder(
+              padding: EdgeInsets.all(20.0),
               itemCount: snapshot.data.length,
               itemBuilder: (context, i ){
                 return _crearItem(context, snapshot.data[i]);
@@ -71,15 +72,22 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.all(15.0),
           child: Row(children: <Widget>[Icon(Icons.save)],mainAxisAlignment: MainAxisAlignment.end,),
         ),),
-        child: ListTile(
-          title: Text(data.title),
-          subtitle: Text(data.id.toString()),
-          trailing: Icon(Icons.keyboard_arrow_right),
-          onTap: (){
-            Navigator.pushNamed(context, ProductPage.route, arguments: data).then((value) {
-              setState((){});
-            });
-          },
+        child: Card(
+          child: Column(
+            children: <Widget>[
+              FadeInImage(image: NetworkImage(data.url),fit: BoxFit.cover, height: 300.0, placeholder: AssetImage("assets/jar-loading.gif"),),
+              ListTile(
+                title: Text(data.title),
+                subtitle: Text(data.id.toString()),
+                trailing: Icon(Icons.keyboard_arrow_right),
+                onTap: (){
+                  Navigator.pushNamed(context, ProductPage.route, arguments: data).then((value) {
+                    setState((){});
+                  });
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
